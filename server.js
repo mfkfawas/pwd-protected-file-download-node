@@ -4,6 +4,8 @@ dotenv.config();
 const mongoose = require('mongoose');
 const multer = require('multer');
 const express = require('express');
+const bcrypt = require('bcrypt');
+const File = require('./model/file');
 
 const app = express();
 mongoose.connect(process.env.DATABASE_URL);
@@ -15,8 +17,20 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-app.post('/upload', upload.single('file'), (req, res) => {
-  res.send('hai buddies');
+app.post('/upload', upload.single('file'), async (req, res) => {
+  // When you use multer, its going to give a property
+  // called file.
+  const fileData = {
+    path: req.file.path,
+    originalname: req.file.originalname,
+  };
+  if (req.body.password != null && req.body.password !== '') {
+    fileData.password = await bcrypt.hash(req.body.password, 10);
+  }
+
+  const file = await File.create(fileData);
+
+  res.render('index', { fileLink: `${req.headers.origin}/file/${file.id}` });
 });
 
 const server = app.listen(process.env.PORT, () => {
