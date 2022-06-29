@@ -7,6 +7,12 @@
     <title>Document</title>
   </head>
   <body>
+    <% if(locals.fileLink != null) { %>
+    <div style="margin-bottom: 1rem; text-align: center">
+      Your file is uploaded
+      <a href="<%= locals.fileLink %>"><%= locals.fileLink %></a>
+    </div>
+    <% } %>
     <form
       action="/upload"
       method="post"
